@@ -1,9 +1,10 @@
 int character;
 int startDelay = 2000;
 int pressDelay = 50;
-int specialDelay = 50;
+int specialDelay = 200;
 int charCount;
 int maxChar = 78; // for 12 pitch
+int letterDelay = 75;
 
 //pins are choosen by the lookup function.
 int pin1;
@@ -50,6 +51,8 @@ boolean delayFlag;
 int lastCharacter;
 int lastLastCharacter;
 int lineEndCharacter;
+boolean waitFlag = false;
+int nextCharacter;
 
 void setup(){
   pinMode(s00, OUTPUT);
@@ -90,8 +93,9 @@ void setup(){
   lastCharacter = 0;
   lastLastCharacter = 0;
   charCount = 0;
+  nextCharacter = 0;
   
-  Serial.begin(9600);
+  Serial.begin(115200);
 
 //This makes satisfies the carraige return signal for starting the typewriter.
   flag = true;
@@ -102,7 +106,7 @@ void setup(){
   typeChar();
   flag = false;
   
-  Serial.println("Now Ready.");
+  //Serial.println("Now Ready.");
   
 }
 
@@ -111,22 +115,54 @@ void loop() {
   character = 0;
   delayFlag = false;
   
+  //if (Serial.available() > 2) waitFlag = true;
+  
+  if (Serial.available() == 0) {
+   // if (waitFlag) {
+      Serial.write("@");
+      //waitFlag = false;
+    //}
+  }
+  
   character = getChar();
   
-   if (charCount == (maxChar-2) && character != 'space') {
-    lineEndCharacter = character;
-    character = 45;
-    setPins(character);
-    convertPin();
-    muxPin(pin1, pin2, pin3, pin4);
-    typeChar();
-    character = 13;
-    setPins(character);
-    convertPin();
-    muxPin(pin1, pin2, pin3, pin4);
-    typeChar();
-    charCount = 0;
-    character = lineEndCharacter;
+  if (charCount == 0 && character == 'space') character = getChar();
+  
+  int myPeek = Serial.peek();
+  
+  if(myPeek != 32) {
+    if (charCount == (maxChar-2) && character != 32) {
+      nextCharacter = Serial.read();
+      myPeek = Serial.peek();
+      if (myPeek != 32){
+        lineEndCharacter = character;
+        character = 45;
+        setPins(character);
+        convertPin();
+        muxPin(pin1, pin2, pin3, pin4);
+        typeChar();
+        character = 13;
+        setPins(character);
+        convertPin();
+        muxPin(pin1, pin2, pin3, pin4);
+        typeChar();
+        charCount = 0;
+        character = lineEndCharacter;
+        setPins(character);
+        convertPin();
+        muxPin(pin1, pin2, pin3, pin4);
+        typeChar();
+        charCount = 1;
+        character = nextCharacter;
+      }
+      else {
+        setPins(character);
+        convertPin();
+        muxPin(pin1, pin2, pin3, pin4);
+        typeChar();
+        character = nextCharacter;
+      }
+    }
   }
   
   if (charCount > (maxChar-8)) {
@@ -137,13 +173,14 @@ void loop() {
   }
   
   if (lastCharacter == character) delayFlag = true;
-  if (lastCharacter == character && lastCharacter != lastLastCharacter) typeChar();
+  //if (lastCharacter == character && lastCharacter != lastLastCharacter) typeChar();
   
   lastLastCharacter = lastCharacter;
   lastCharacter = character;
   
-  Serial.print("character: ");
-  Serial.println(character);
+  //Serial.print("character: ");
+  //Serial.println();
+  //Serial.print(character);
   
   setPins(character);
   
@@ -151,22 +188,25 @@ void loop() {
   
   muxPin(pin1, pin2, pin3, pin4);
   
-  typeChar();
+  if (character != 64) typeChar();
   
   charCount ++;
   if (character == 13) charCount = 0;
+  
+  delay(letterDelay);
 }
 
 // ========================================================================
 
 int getChar(){
+
   int x;
   if (Serial.available() > 0) {
-  x = Serial.read();
-  return x;
+    x = Serial.read();
+    return x;
   }
  else getChar();
-}
+ }
 
 // convertPin translates the looked up pin code to pins 0-7
 void convertPin(){
@@ -334,5 +374,6 @@ void setPins(int character) {
   else if (character == 'TAB') { pin1 = 8; pin2 = 14;}
   else if (character == 32) {pin1 = 1; pin2 = 15;}
   else if (character == 200) {pin1 = 7; pin2 = 14; pin3 = 0; pin4 = 0;}
+  else {pin1 = 7; pin2 = 14; pin3 = 0; pin4 = 0;}
 //change pitch with '@' symbol // else if (character == 64) {pin1 = 3; pin2 = 9; pin3 = 5; pin4 = 15;}
 }
