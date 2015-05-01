@@ -92,7 +92,7 @@ void setup(){
   lastLastCharacter = 0;
   charCount = 0;
   
-  Serial.begin(115200);
+  Serial.begin(9600);
 
 //This makes satisfies the carraige return signal for starting the typewriter.
   flag = true;
