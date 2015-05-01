@@ -4,7 +4,6 @@ int pressDelay = 50;
 int specialDelay = 50;
 int charCount;
 int maxChar = 78; // for 12 pitch
-int numChars = 5;
 
 //pins are choosen by the lookup function.
 int pin1;
@@ -103,28 +102,7 @@ void setup(){
   typeChar();
   flag = false;
   
-  
   Serial.println("Now Ready.");
-  //Serial.println("Enter number of characters to print");
-  //while (Serial.available() != 1) {};
-  //int numChars = Serial.read();
-  Serial.print("Number of Characters: ");
-  Serial.println(numChars);
-  numChars ++;
-  
-  Serial.println("Please enter all text");
-  while(Serial.available() != 1) {};
-  
-  int string[numChars];
-  int n = 0;
-  while (!Serial.available()) {
-    string[n] = Serial.read();
-    n = n+1 ;
-  }
-  
-  for (int i = 0; i < numChars; i++) {
-    Serial.print(string[i]);
-  }
   
 }
 
