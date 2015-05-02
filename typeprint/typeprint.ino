@@ -1,7 +1,7 @@
 int character;
 int startDelay = 2000;
 int pressDelay = 50;
-int specialDelay = 200;
+int specialDelay = 300;
 int charCount;
 int maxChar = 78; // for 12 pitch
 int letterDelay = 75;
@@ -374,6 +374,7 @@ void setPins(int character) {
   else if (character == 'TAB') { pin1 = 8; pin2 = 14;}
   else if (character == 32) {pin1 = 1; pin2 = 15;}
   else if (character == 200) {pin1 = 7; pin2 = 14; pin3 = 0; pin4 = 0;}
+  //else if (character == 39) {
   else {pin1 = 7; pin2 = 14; pin3 = 0; pin4 = 0;}
 //change pitch with '@' symbol // else if (character == 64) {pin1 = 3; pin2 = 9; pin3 = 5; pin4 = 15;}
 }
