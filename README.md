@@ -1,0 +1,2 @@
+# typeprint
+Arduino controlled typewriter.
